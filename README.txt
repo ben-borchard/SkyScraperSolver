@@ -1,0 +1,3 @@
+This solves the skyscrapers logic game
+
+It is still being constructed...
