@@ -22,17 +22,27 @@ public class Grid {
         this.puzzleStatus = puzzle;
     }
 
-    public int setCell(int row, int col, int val){
+    public int setCellNot(int row, int col, int val){
+        return cells[row][col].not(val, this);
+    }
 
-        cells[row][col].setVal(val);
+    public int setCellVal(int row, int col, int val){
+
+
+        int r = cells[row][col].setVal(val);
+        if (r == -1)
+            return r;
         filled++;
 
-        for(int i=0;i<cells.length;i++)
-            cells[row][i].not(val, this);
+        for(int i=0;i<cells.length;i++) {
+            r = cells[row][i].not(val, this);
+            if (r != 0) { return r; }
+        }
         Cell[] yarray = new Cell[cells.length];
         for(int i=0;i<cells.length;i++) {
-            cells[i][col].not(val, this);
+            r = cells[i][col].not(val, this);
             yarray[i] = cells[i][col];
+            if (r != 0) { return r; }
         }
 
         if (checkCellArray(cells[row], puzzleStatus[3][row], puzzleStatus[1][row]) == -1)
@@ -46,12 +56,12 @@ public class Grid {
         return 0;
     }
 
-    public void checkRowCol(int row, int col, int val){
+    public int checkRowCol(int row, int col, int val){
         // Col
         int cWithVal = -1;
         boolean onePossibility = true;
         for (int i=0;i<cells.length;i++){
-            if (cells[i][col].possibilities[val-1] != 0){
+            if (cells[i][col].possible(val)){
                 if (cWithVal != -1) {
                     onePossibility = false;
                     break;
@@ -61,7 +71,8 @@ public class Grid {
             }
         }
         if (onePossibility && cWithVal != -1) {
-            setCell(cWithVal, col, val);
+            int r = setCellVal(cWithVal, col, val);
+            if ( r != 0 ) { return r; }
         }
 
 
@@ -69,7 +80,7 @@ public class Grid {
         cWithVal = -1;
         onePossibility = true;
         for (int i=0;i<cells.length;i++){
-            if (cells[row][i].possibilities[val-1] != 0){
+            if (cells[row][i].possible(val)){
                 if (cWithVal != -1) {
                     onePossibility = false;
                     break;
@@ -79,8 +90,10 @@ public class Grid {
             }
         }
         if (onePossibility && cWithVal != -1) {
-            setCell(row, cWithVal, val);
+            int r = setCellVal(row, cWithVal, val);
+            if ( r != 0 ) { return r; }
         }
+        return 0;
     }
 
     public void init(){
@@ -88,7 +101,7 @@ public class Grid {
         // Top
         for (int i=0;i<cells.length;i++){
             if(puzzleStatus[0][i] == 1)
-                setCell(0, i, 6);
+                setCellVal(0, i, cells.length);
             for(int j=puzzleStatus[0][i]-2;j>=0;j--){
                 for(int k=cells.length;k>=cells.length-(puzzleStatus[0][i]-2-j);k--) {
                     cells[j][i].not(k, this);
@@ -99,7 +112,7 @@ public class Grid {
         // Right
         for (int i=0;i<cells.length;i++){
             if (puzzleStatus[1][i] == 1)
-                setCell(i, cells.length-1, 6);
+                setCellVal(i, cells.length - 1, cells.length);
             for(int j=cells.length-(puzzleStatus[1][i]-1);j<cells.length;j++){
                 for(int k=cells.length;k>=cells.length-(j-(cells.length-(puzzleStatus[1][i]-1)));k--) {
                     cells[i][j].not(k, this);
@@ -111,7 +124,7 @@ public class Grid {
         // Bottom
         for (int i=0;i<cells.length;i++){
             if (puzzleStatus[2][i] == 1)
-                setCell(cells.length-1, i, 6);
+                setCellVal(cells.length - 1, i, cells.length);
             for(int j=cells.length-(puzzleStatus[2][i]-1);j<cells.length;j++){
                 for(int k=cells.length;k>=cells.length-(j-(cells.length-(puzzleStatus[2][i]-1)));k--) {
                     cells[j][i].not(k, this);
@@ -124,7 +137,7 @@ public class Grid {
         // Left
         for (int i=0;i<cells.length;i++){
             if (puzzleStatus[3][i] == 1)
-                setCell(i, 0, 6);
+                setCellVal(i, 0, cells.length);
             for(int j=puzzleStatus[3][i]-2;j>=0;j--){
                 for(int k=cells.length;k>=cells.length-(puzzleStatus[3][i]-2-j);k--) {
                     cells[i][j].not(k, this);
@@ -186,21 +199,15 @@ public class Grid {
         return true;
     }
 
+    public boolean possible(int row, int col, int val){
+        return cells[row][col].possible(val);
+    }
+
     public String toString(){
         String str = "";
         for(Cell[] cs : cells) {
             for (Cell c : cs)
                 str += c + " ";
-            str += "\n";
-        }
-        return str;
-    }
-
-    public String pToString(){
-        String str = "";
-        for(Cell[] cs : cells) {
-            for (Cell c : cs)
-                str += c.pToString();
             str += "\n";
         }
         return str;

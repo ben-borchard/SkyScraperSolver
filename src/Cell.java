@@ -3,10 +3,10 @@
  */
 public class Cell {
 
-    int[] possibilities;
-    int numpos;
-    int val;
-    int row, col;
+    private int[] possibilities;
+    private int numpos;
+    private int val;
+    private int row, col;
 
     public Cell(int row, int col, int s){
 
@@ -20,16 +20,21 @@ public class Cell {
         this.val = 0;
     }
 
-    public void setVal(int val){
-        System.out.println("Setting row "+ row +", col "+ col +" as "+val);
+    public int setVal(int val){
+        if (possibilities[val-1] == 0)
+            return -1;
+        possibilities = new int[possibilities.length];
+        possibilities[val-1] = val;
+        numpos = 1;
         this.val = val;
+        return 0;
     }
 
     public int getVal(){
         return this.val;
     }
 
-    public void not(int possibility, Grid g){
+    public int not(int possibility, Grid g){
 
         if (val == 0 && possibilities[possibility - 1] != 0) {
             possibilities[possibility - 1] = 0;
@@ -40,27 +45,29 @@ public class Cell {
             if (numpos == 1) {
                 for (int p : possibilities)
                     if (p != 0)
-                        g.setCell(row, col,p);
+                        return g.setCellVal(row, col, p);
             }
 
-            g.checkRowCol(row, col, possibility);
+            return g.checkRowCol(row, col, possibility);
         }
+        return 0;
     }
 
     public boolean filled(){
         return val != 0;
     }
 
-    public String toString(){
-        return val+"";
+    public String toString() {
+        String str = "| ";
+        for (int i : possibilities) {
+            str += i + " ";
+        }
+        return str + "|";
+//        return val+"";
     }
 
-    public String pToString(){
-        String str =  "| ";
-        for (int i : possibilities){
-            str += i+" ";
-        }
-        return str+"|";
+    public boolean possible(int val){
+        return possibilities[val-1] != 0;
     }
 
 
