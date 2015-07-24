@@ -9,7 +9,8 @@ public class SkyscraperSolver {
 
     private Grid grid;
 
-    private Stack<Grid> guesses;
+    private Stack<Grid> grids;
+    private Stack<int[]> guesses;
 
     public SkyscraperSolver(int s) {
         this.s = s;
@@ -22,6 +23,7 @@ public class SkyscraperSolver {
             System.exit(1);
         }
 
+        this.grids = new Stack();
         this.guesses = new Stack();
 
         s = top.length;
@@ -40,10 +42,9 @@ public class SkyscraperSolver {
 
 
         // start guessing
-        for (int i=0;i<5;i++){
-//        while(r == 0){
+//        for (int i=0;i<10;i++){
+        while(r == 0){
             r = guess();
-
         }
 
         System.out.println(grid);
@@ -53,28 +54,36 @@ public class SkyscraperSolver {
         for (int i = s; i > 0; i--) {
             for (int j = 0; j < s; j++) {
                 for (int k = 0; k < s; k++) {
-                    if (grid.possible(j, k, i)) {
-                        guesses.push(grid);
-                        int r = grid.setCellVal(j, k, i);
+
+                    if (!grid.cellFilled(j,k) && grid.possible(j, k, i)) {
+                        grids.push(grid.clone());
+                        guesses.push(new int[]{j, k, i});
                         System.out.println("guessing row: "+j+" col: "+k+" is "+i );
+                        System.out.println(grids.size() + "");
+                        int r = grid.setCellVal(j, k, i);
                         System.out.println(grid);
                         if (r == 1) {
                             System.out.println("solved");
                             return 1;
                         } else if (r == -1) {
-
-                            if (guesses.isEmpty())
-                                return -1;
-                            else {
-                                System.out.println("bad guess");
-                                grid = guesses.pop();
-                                grid.setCellNot(j, k, i);
-                                return 0;
+                            while(r == -1) {
+                                if (grids.isEmpty()) {
+                                    System.out.println("unsolvable");
+                                    return -1;
+                                }
+                                int[] lastGuess = guesses.pop();
+                                System.out.println("bad guess, removing possibility of row: " + lastGuess[0] + " col: " + lastGuess[1] + " being " + lastGuess[2]);
+                                System.out.println(grid);
+                                grid = grids.pop();
+                                System.out.println(grids.size() + "");
+                                r = grid.setCellNot(lastGuess[0], lastGuess[1], lastGuess[2]);
                             }
+                            return r;
                         } else {
-                            System.out.println("not enough info");
+//                            System.out.println("not enough info");
                             return 0;
                         }
+
                     }
                 }
             }

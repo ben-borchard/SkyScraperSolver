@@ -22,24 +22,43 @@ public class Grid {
         this.puzzleStatus = puzzle;
     }
 
+    public Grid(Cell[][] cells, int filled, int[][] puzzle){
+        this.cells = cells;
+        this.filled = filled;
+        this.puzzleStatus = puzzle;
+    }
+
     public int setCellNot(int row, int col, int val){
         return cells[row][col].not(val, this);
+    }
+
+    public boolean cellFilled(int row, int col){
+        return cells[row][col].filled();
     }
 
     public int setCellVal(int row, int col, int val){
 
 
+
         int r = cells[row][col].setVal(val);
         if (r == -1)
             return r;
+        else if (r == 1)
+            return 0;
+
         filled++;
 
         for(int i=0;i<cells.length;i++) {
+
             r = cells[row][i].not(val, this);
+
             if (r != 0) { return r; }
         }
         Cell[] yarray = new Cell[cells.length];
         for(int i=0;i<cells.length;i++) {
+            if (row == 3 && col == 3 && val == 3 && i == 2){
+                System.out.println("test");
+            }
             r = cells[i][col].not(val, this);
             yarray[i] = cells[i][col];
             if (r != 0) { return r; }
@@ -150,20 +169,25 @@ public class Grid {
         int[] dupArray = new int[group.length];
         int ssFromLeftOrTop = 0;
         int ssFromRightOrBottom = 0;
+        int ltMax = 0;
+        int rbMax = 0;
         boolean filled = true;
+
 
         for (int i=0;i<cells.length;i++){
 
             if (group[i].getVal() != 0) {
                 dupArray[group[i].getVal() - 1]++;
 
-                if (i != 0 && group[i].getVal() > group[i - 1].getVal()) {
+                if (group[i].getVal() > ltMax) {
                     ssFromLeftOrTop++;
+                    ltMax = group[i].getVal();
                 }
 
                 int s = group.length;
-                if (i != 0 && group[s-i-1].getVal() > group[s-i].getVal()) {
+                if (group[s-i-1].getVal() > rbMax) {
                     ssFromRightOrBottom++;
+                    rbMax = group[s-i-1].getVal();
                 }
             } else
                 filled = false;
@@ -174,12 +198,18 @@ public class Grid {
             if (n > 1)
                 return 0;
 
-        if ((ssFromLeftOrTop > ltSkyscrapers && ltSkyscrapers != 0) || (ssFromRightOrBottom > rbSkyscrapers && rbSkyscrapers != 0))
-            return 0; // Bad
-        else if (filled && (ssFromLeftOrTop == ltSkyscrapers || ltSkyscrapers == 0) && (ssFromRightOrBottom == rbSkyscrapers || rbSkyscrapers == 0))
+        if (filled && (ssFromLeftOrTop == ltSkyscrapers || ltSkyscrapers == 0) && (ssFromRightOrBottom == rbSkyscrapers || rbSkyscrapers == 0))
             return 1; // Good
+        else if (filled && ((ssFromLeftOrTop != ltSkyscrapers && ltSkyscrapers != 0) || (ssFromRightOrBottom != rbSkyscrapers && rbSkyscrapers != 0))) {
+            System.out.println("filled is bad, lt val: "+ltSkyscrapers+" lt actual: "+ssFromLeftOrTop+" | rb val: "+rbSkyscrapers+" rb actual: "+ssFromRightOrBottom);
+            return -1; // Bad
+        }
+        else if ((ssFromLeftOrTop > ltSkyscrapers && ltSkyscrapers != 0) || (ssFromRightOrBottom > rbSkyscrapers && rbSkyscrapers != 0)) {
+            System.out.println("too many skyscrapers, lt val: "+ltSkyscrapers+" lt actual: "+ssFromLeftOrTop+" | rb val: "+rbSkyscrapers+" rb actual: "+ssFromRightOrBottom);
+            return -1; // Bad
+        }
         else
-            return -1; // Unsure
+            return 0; // Unsure
     }
 
     private boolean solved(){
@@ -211,5 +241,15 @@ public class Grid {
             str += "\n";
         }
         return str;
+    }
+
+    public Grid clone(){
+        Cell[][] newCells = new Cell[cells.length][cells.length];
+        for (int i=0;i<cells.length;i++){
+            for (int j=0;j<cells.length;j++){
+                newCells[i][j] = cells[i][j].clone();
+            }
+        }
+        return new Grid(newCells, this.filled, this.puzzleStatus);
     }
 }

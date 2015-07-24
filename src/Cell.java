@@ -8,6 +8,14 @@ public class Cell {
     private int val;
     private int row, col;
 
+    public Cell(int row, int col, int[] possibilities, int val, int numpos){
+        this.row = row;
+        this.col = col;
+        this.numpos = numpos;
+        this.val = val;
+        this.possibilities = possibilities;
+    }
+
     public Cell(int row, int col, int s){
 
         this.possibilities = new int[s];
@@ -21,8 +29,12 @@ public class Cell {
     }
 
     public int setVal(int val){
+
         if (possibilities[val-1] == 0)
             return -1;
+        if (this.val == val){
+            return 1;
+        }
         possibilities = new int[possibilities.length];
         possibilities[val-1] = val;
         numpos = 1;
@@ -68,6 +80,10 @@ public class Cell {
 
     public boolean possible(int val){
         return possibilities[val-1] != 0;
+    }
+
+    public Cell clone(){
+        return new Cell(row, col, possibilities.clone(), val, numpos);
     }
 
 
