@@ -6,10 +6,15 @@ public class Grid {
     private Cell[][] cells;
 
     private int[][] puzzleStatus;
+    private int[][] initialValues;
 
     private int filled;
 
 
+    public Grid(int s, int[][] puzzle, int[][] initialValues){
+        this(s, puzzle);
+        this.initialValues = initialValues;
+    }
 
     public Grid(int s, int[][] puzzle){
         cells = new Cell[s][s];
@@ -56,9 +61,6 @@ public class Grid {
         }
         Cell[] yarray = new Cell[cells.length];
         for(int i=0;i<cells.length;i++) {
-            if (row == 3 && col == 3 && val == 3 && i == 2){
-                System.out.println("test");
-            }
             r = cells[i][col].not(val, this);
             yarray[i] = cells[i][col];
             if (r != 0) { return r; }
@@ -117,6 +119,11 @@ public class Grid {
 
     public void init(){
 
+        // Initial Cells
+        if (initialValues != null){
+            insertInitialValues();
+        }
+
         // Top
         for (int i=0;i<cells.length;i++){
             if(puzzleStatus[0][i] == 1)
@@ -165,6 +172,13 @@ public class Grid {
         }
     }
 
+    private void insertInitialValues(){
+        for(int i=0;i<cells.length;i++)
+            for(int j=0;j<cells.length;j++)
+                if (initialValues[i][j] != 0)
+                    setCellVal(i,j,initialValues[i][j]);
+    }
+
     private int checkCellArray(Cell[] group, int ltSkyscrapers, int rbSkyscrapers){
         int[] dupArray = new int[group.length];
         int ssFromLeftOrTop = 0;
@@ -201,11 +215,11 @@ public class Grid {
         if (filled && (ssFromLeftOrTop == ltSkyscrapers || ltSkyscrapers == 0) && (ssFromRightOrBottom == rbSkyscrapers || rbSkyscrapers == 0))
             return 1; // Good
         else if (filled && ((ssFromLeftOrTop != ltSkyscrapers && ltSkyscrapers != 0) || (ssFromRightOrBottom != rbSkyscrapers && rbSkyscrapers != 0))) {
-            System.out.println("filled is bad, lt val: "+ltSkyscrapers+" lt actual: "+ssFromLeftOrTop+" | rb val: "+rbSkyscrapers+" rb actual: "+ssFromRightOrBottom);
+//            System.out.println("filled is bad, lt val: "+ltSkyscrapers+" lt actual: "+ssFromLeftOrTop+" | rb val: "+rbSkyscrapers+" rb actual: "+ssFromRightOrBottom);
             return -1; // Bad
         }
         else if ((ssFromLeftOrTop > ltSkyscrapers && ltSkyscrapers != 0) || (ssFromRightOrBottom > rbSkyscrapers && rbSkyscrapers != 0)) {
-            System.out.println("too many skyscrapers, lt val: "+ltSkyscrapers+" lt actual: "+ssFromLeftOrTop+" | rb val: "+rbSkyscrapers+" rb actual: "+ssFromRightOrBottom);
+//            System.out.println("too many skyscrapers, lt val: "+ltSkyscrapers+" lt actual: "+ssFromLeftOrTop+" | rb val: "+rbSkyscrapers+" rb actual: "+ssFromRightOrBottom);
             return -1; // Bad
         }
         else
