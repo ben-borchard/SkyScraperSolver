@@ -52,8 +52,6 @@ public class Cell {
             possibilities[possibility - 1] = 0;
             numpos--;
 
-
-
             if (numpos == 1) {
                 for (int p : possibilities)
                     if (p != 0)

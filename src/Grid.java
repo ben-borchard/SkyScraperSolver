@@ -43,8 +43,6 @@ public class Grid {
 
     public int setCellVal(int row, int col, int val){
 
-
-
         int r = cells[row][col].setVal(val);
         if (r == -1)
             return r;
@@ -53,12 +51,15 @@ public class Grid {
 
         filled++;
 
+        /* Check the row for dupes */
         for(int i=0;i<cells.length;i++) {
 
             r = cells[row][i].not(val, this);
 
             if (r != 0) { return r; }
         }
+
+        /* Check the col for dupes, save col values */
         Cell[] yarray = new Cell[cells.length];
         for(int i=0;i<cells.length;i++) {
             r = cells[i][col].not(val, this);
@@ -66,12 +67,18 @@ public class Grid {
             if (r != 0) { return r; }
         }
 
+        /* Check rows and cols for the correct number of visible skyscrapers */
         if (checkCellArray(cells[row], puzzleStatus[3][row], puzzleStatus[1][row]) == -1)
             return -1;
         if (checkCellArray(yarray, puzzleStatus[0][col], puzzleStatus[2][col]) == -1)
             return -1;
 
+        /* Check to see if all rows have been filled out */
         if (filled == cells.length*cells.length){
+            if (solved()){
+                System.out.println(this);
+                solved();
+            }
             return solved() ? 1 : -1;
         }
         return 0;
@@ -207,10 +214,10 @@ public class Grid {
                 filled = false;
         }
 
-        // Check for duplicate numbers
+        /* Check for duplicate numbers, they are not okay */
         for (int n : dupArray)
             if (n > 1)
-                return 0;
+                return -1;
 
         if (filled && (ssFromLeftOrTop == ltSkyscrapers || ltSkyscrapers == 0) && (ssFromRightOrBottom == rbSkyscrapers || rbSkyscrapers == 0))
             return 1; // Good

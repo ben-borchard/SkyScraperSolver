@@ -73,12 +73,12 @@ public class SkyscraperSolver {
                         int r = grid.setCellVal(j, k, i);
 //                        System.out.println(grid);
                         if (r == 1) {
-//                            System.out.println("solved");
+                            System.out.println("solved");
                             return 1;
                         } else if (r == -1) {
                             while(r == -1) {
                                 if (grids.isEmpty()) {
-//                                    System.out.println("unsolvable");
+                                    System.out.println("unsolvable");
                                     return -1;
                                 }
                                 int[] lastGuess = guesses.pop();
@@ -90,7 +90,7 @@ public class SkyscraperSolver {
                             }
                             return r;
                         } else {
-//                            System.out.println("not enough info");
+                            System.out.println("not enough info");
                             return 0;
                         }
 
